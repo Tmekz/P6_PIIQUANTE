@@ -3,6 +3,13 @@ const MIME_TYPES = {
   "image/jpg": "jpg",
   "image/jpeg": "jpeg",
   "image/png": "png",
+  "image/bmp": "bmp",
+  "image/gif": "gif",
+  "image/ico": "ico",
+  "image/svg": "svg",
+  "image/tiff": "tiff",
+  "image/tif": "tif",
+  "image/webp": "webp",
 };
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
