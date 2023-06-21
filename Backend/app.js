@@ -6,7 +6,7 @@ const app = express();
 const mongoose = require("mongoose");
 
 //   Importation .env
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv").config({ path: "./config/.env" });
 
 // Importation du fichier DB
 const connectDB = require("../Backend/config/DB");
@@ -18,11 +18,13 @@ connectDB();
 const userRoutes = require("./routes/user.routes");
 
 // Importation des models
-const UserModel = require("./models/User_model");
-// const SauceModel = require("./models/Sauce_model");
+const Sauce = require("./models/Sauce_model");
+
+const saucesRoutes = require("./routes/sauce.routes");
 
 // on importe path, donne accés au chemin du système de fichiers
 const path = require("path");
+const { log } = require("console");
 
 // Permet le cross origin pour éviter les erreurs de CORS
 app.use((req, res, next) => {
@@ -38,10 +40,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Extrait le corps JSON de la requete POST du front end
+// Extrait le corps JSON de la requete POST du front end (anciennment bodyParser.json())
 app.use(express.json());
 
 // Création des routes endpoints
 app.use("/api/auth", userRoutes);
+app.use("/api/sauces", saucesRoutes);
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 module.exports = app;
