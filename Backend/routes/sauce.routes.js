@@ -20,6 +20,6 @@ router.delete("/:id", auth, saucesCtrl.deleteOneSauce);
 router.put("/:id", auth, multer, saucesCtrl.modifyOneSauce);
 
 // Like ou dislike une sauce
-router.put("/:id/like", auth, saucesCtrl.likeOnesauce);
+router.post("/:id/like", auth, saucesCtrl.likeOneSauce);
 
 module.exports = router;
