@@ -8,6 +8,9 @@ const mongoose = require("mongoose");
 //   Importation .env
 const dotenv = require("dotenv").config({ path: "./config/.env" });
 
+// Important morgan
+const morgan = require("morgan");
+
 // Importation du fichier DB
 const connectDB = require("../Backend/config/DB");
 
@@ -42,6 +45,8 @@ app.use((req, res, next) => {
 
 // Extrait le corps JSON de la requete POST du front end (anciennment bodyParser.json())
 app.use(express.json());
+
+app.use(morgan("combined"));
 
 // Création des routes endpoints
 app.use("/api/auth", userRoutes);

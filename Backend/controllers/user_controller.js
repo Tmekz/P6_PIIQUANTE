@@ -1,8 +1,8 @@
 const User = require("../models/User_model");
 const bcrypt = require("bcrypt");
-const cryptojs = require("crypto-js");
-const jwt = require("jsonwebtoken");
+const jsonWebToken = require("jsonwebtoken");
 const validator = require("validator");
+const dotenv = require("dotenv").config({ path: "./config/.env" });
 const emailRegex = /^[\w_-]+@[\w-]+\.[a-z]{2,4}$/i;
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$/;
@@ -11,14 +11,10 @@ exports.signup = (req, res, next) => {
   const validatorEmail = validator.isEmail(req.body.email);
   const isValidePassword = passwordRegex.test(req.body.password);
   const isValideEmail = emailRegex.test(req.body.email);
-  console.log(validatorEmail);
-  console.log(req.body.email);
+  
   if (validatorEmail && isValideEmail && isValidePassword) {
-    console.log(validatorEmail);
-    // nous appelons la fonction de hachage de bcrypt dans notre mot de passe et lui demandons de « saler » le mot de passe 10 fois. Plus la valeur est élevée, plus l'exécution de la fonction sera longue, et plus le hachage sera sécurisé. il s'agit d'une fonction asynchrone qui renvoie une Promise dans laquelle nous recevons le hash généré ;
     bcrypt
       .hash(req.body.password, 10)
-      // dans notre bloc then , nous créons un utilisateur et l'enregistrons dans la base de données, en renvoyant une réponse de réussite en cas de succès, et des erreurs avec le code d'erreur en cas d'échec. il s'agit d'une fonction asynchrone qui renvoie une Promise dans laquelle nous recevons le hash généré ;
       .then((hash) => {
         const user = new User({
           email: req.body.email,
@@ -35,12 +31,13 @@ exports.signup = (req, res, next) => {
       })
       .catch((error) => res.status(500).json({ error }));
   } else {
-    // Pk le message ne s'affiche pas
     return res
       .status(400)
       .json({ message: "L'email doit avoir un format classique" });
   }
 };
+
+
 
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
@@ -61,20 +58,20 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jwt.sign(
-              { userId: user._id },
-              // remplacer par key longue
-              "RANDOM_TOKEN_SECRET",
-              {
-                expiresIn: "24h",
-              }
-            ),
+            token: jsonWebToken.sign({ userId: user._id }, process.env.TOKEN_KEY, {
+              expiresIn: "24h",
+            }),
           });
         })
         .catch((error) => res.status(500).json({ error }));
     })
     .catch((error) => res.status(500).json({ error }));
 };
+
+// nous appelons la fonction de hachage de bcrypt dans notre mot de passe et lui demandons de « saler » le mot de passe 10 fois. Plus la valeur est élevée, plus l'exécution de la fonction sera longue, et plus le hachage sera sécurisé. il s'agit d'une fonction asynchrone qui renvoie une Promise dans laquelle nous recevons le hash généré ;
+// dans notre bloc then , nous créons un utilisateur et l'enregistrons dans la base de données, en renvoyant une réponse de réussite en cas de succès, et des erreurs avec le code d'erreur en cas d'échec. il s'agit d'une fonction asynchrone qui renvoie une Promise dans laquelle nous recevons le hash généré ;
+
+// -----------------------------------------------//
 
 // Nous utilisons la fonction sign de jsonwebtoken pour chiffrer un nouveau token.
 
