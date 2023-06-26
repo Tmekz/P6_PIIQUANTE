@@ -28,6 +28,7 @@ const saucesRoutes = require("./routes/sauce.routes");
 // on importe path, donne accés au chemin du système de fichiers
 const path = require("path");
 const { log } = require("console");
+const multer = require("multer");
 
 // Permet le cross origin pour éviter les erreurs de CORS
 app.use((req, res, next) => {
@@ -46,7 +47,8 @@ app.use((req, res, next) => {
 // Extrait le corps JSON de la requete POST du front end (anciennment bodyParser.json())
 app.use(express.json());
 
-app.use(morgan("combined"));
+// Outil morgan pour more data terminal
+app.use(morgan("dev"));
 
 // Création des routes endpoints
 app.use("/api/auth", userRoutes);
