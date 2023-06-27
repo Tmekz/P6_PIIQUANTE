@@ -191,51 +191,6 @@ exports.modifyOneSauce = (req, res, next) => {
   });
 };
 
-// exports.modifyOneSauce = (req, res, next) => {
-//   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
-//     // Nous verifions que la personne qui souhaite faire une modification soit bien la créatrice! Postman
-//     if (sauce.userId === req.auth.userId) {
-
-//       // Si la personne modifie l'image alors nous supprimons l'ancienne avant de modifier le reste
-//       if (req.file) {
-//         Sauce.findOne({ _id: req.params.id })
-//           .then((sauce) => {
-//             const filename = sauce.imageUrl.split("/images/")[1];
-//             fs.unlink(`images/${filename}`, () => {
-//               // Puis nous mettons à jour le reste de la modification
-//               const sauceObject = {
-//                 ...JSON.parse(req.body.sauce),
-//                 imageUrl: `${req.protocol}://${req.get("host")}/images/${
-//                   req.file.filename
-//                 }`,
-//               };
-//               Sauce.updateOne(
-//                 { _id: req.params.id },
-//                 { ...sauceObject, _id: req.params.id }
-//               )
-//                 .then(() =>
-//                   res.status(200).json({ message: "Sauce modifiée!" })
-//                 )
-//                 .catch((error) => res.status(400).json({ error }));
-//             });
-//           })
-//           .catch((error) => res.status(500).json({ error }));
-//       } else {
-//         // Ou la personne ne modifie pas l'image et donc nous modifions seulement le reste
-//         const sauceObject = { ...req.body };
-//         Sauce.updateOne(
-//           { _id: req.params.id },
-//           { ...sauceObject, _id: req.params.id }
-//         )
-//           .then(() => res.status(200).json({ message: "Sauce modifiée!" }))
-//           .catch((error) => res.status(400).json({ error }));
-//       }
-//     } else {
-//       return res.status(403).json("unauthorized request");
-//     }
-//   });
-// };
-
 // Like ou dislike une sauce
 exports.likeOneSauce = (req, res, next) => {
   const userId = req.body.userId;

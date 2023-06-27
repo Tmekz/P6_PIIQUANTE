@@ -5,13 +5,13 @@ const validator = require("validator");
 const dotenv = require("dotenv").config({ path: "./config/.env" });
 const emailRegex = /^[\w_-]+@[\w-]+\.[a-z]{2,4}$/i;
 const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$/; //Regex minimum 5 caractères, une majuscule, un chiffre, un caractère spécial
 
 exports.signup = (req, res, next) => {
   const validatorEmail = validator.isEmail(req.body.email);
   const isValidePassword = passwordRegex.test(req.body.password);
   const isValideEmail = emailRegex.test(req.body.email);
-  
+
   if (validatorEmail && isValideEmail && isValidePassword) {
     bcrypt
       .hash(req.body.password, 10)
@@ -24,20 +24,20 @@ exports.signup = (req, res, next) => {
           .save()
           .then(() => res.status(201).json({ message: "Utilisateur crée !" }))
           .catch((error) =>
-            res
-              .status(400)
-              .json({ message: "L'email doit avoir un format classique" })
+            res.status(400).json({
+              error,
+            })
           );
       })
       .catch((error) => res.status(500).json({ error }));
   } else {
-    return res
-      .status(400)
-      .json({ message: "L'email doit avoir un format classique" });
+    console.log("Erreur de validation :", req.body.email, req.body.password);
+    return res.status(450).json({
+      message:
+        "L'email doit avoir un format classique. Le mot de passe doit comporter au minimum 5 caractères, une majuscule, un chiffre et un caractère spécial",
+    });
   }
 };
-
-
 
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
@@ -58,9 +58,13 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jsonWebToken.sign({ userId: user._id }, process.env.TOKEN_KEY, {
-              expiresIn: "24h",
-            }),
+            token: jsonWebToken.sign(
+              { userId: user._id },
+              process.env.TOKEN_KEY,
+              {
+                expiresIn: process.env.TOKEN_TEMP,
+              }
+            ),
           });
         })
         .catch((error) => res.status(500).json({ error }));

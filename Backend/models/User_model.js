@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 // création de schéma de connection d'utilisateur
-// Dans notre schéma, la valeur unique , avec l'élément mongoose-unique-validator passé comme plug-in, s'assurera que deux utilisateurs ne puissent partager la même adresse e-mail.
+// Dans notre schéma, la valeur unique , avec l'élément mongoose-unique-validator passé comme plug-in, on s'assurera que deux utilisateurs ne puissent partager la même adresse e-mail.
 const userSchema = mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },

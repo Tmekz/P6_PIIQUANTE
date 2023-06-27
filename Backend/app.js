@@ -50,6 +50,9 @@ app.use(express.json());
 // Outil morgan pour more data terminal
 app.use(morgan("dev"));
 
+// Désactivation du "x-powered-by" dans le headers pour mesure de sécurité supplémentaire
+app.disable("x-powered-by");
+
 // Création des routes endpoints
 app.use("/api/auth", userRoutes);
 app.use("/api/sauces", saucesRoutes);
