@@ -19,47 +19,14 @@ exports.getOneSauce = (req, res, next) => {
 };
 
 // Créer une sauce
-// sauceObject.userId ===  à l'id du créateur de la sauce
-// req.auth.userId === à l'id de celui qui fait la demande
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
 
-  // Tableau des champs requis avec validation minimale de 4 caractères
-  const requiredFields = [
-    { field: "name", minLength: 2 },
-    { field: "manufacturer", minLength: 2 },
-    { field: "description", minLength: 5 },
-    { field: "mainPepper", minLength: 2 },
-  ];
-
-  // Vérification des champs requis
-  const missingFields = requiredFields.filter((field) => {
-    const fieldValue = sauceObject[field.field];
-    return !fieldValue || fieldValue.trim().length < field.minLength;
-  });
-
-  if (missingFields.length > 0) {
-    return res.status(400).json({
-      error: `Les champs suivants sont requis avec un minimum de ${
-        missingFields[0].minLength
-      } caractères : ${missingFields.map((field) => field.field).join(", ")}`,
-    });
-  }
-
-  // Vérification de la valeur de heat
-  if (sauceObject.heat < 1 || sauceObject.heat > 10) {
-    return res
-      .status(400)
-      .json({ error: "Le champ heat doit être compris entre 1 et 10." });
-  }
-
   // Regex pour correspondre aux extensions autorisées
   const allowedExtensionsRegex = /\.(jpeg|png|bmp|gif|ico|svg|tiff|tif|webp)$/i;
-
   // Vérification de l'extension du fichier
   const fileName = req.file.filename;
   const fileExtension = fileName.match(allowedExtensionsRegex);
-
   if (!fileExtension) {
     return res.status(400).json({
       error:
@@ -74,6 +41,8 @@ exports.createSauce = (req, res, next) => {
     dislikes: 0,
   });
 
+  // sauceObject.userId ===  à l'id du créateur de la sauce
+  // req.auth.userId === à l'id de celui qui fait la demande
   if (sauceObject.userId === req.auth.userId) {
     sauce
       .save()
@@ -89,12 +58,59 @@ exports.createSauce = (req, res, next) => {
   }
 };
 
+// Modifier une sauce
+exports.modifyOneSauce = (req, res, next) => {
+  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    // Vérification de l'utilisateur qui souhaite effectuer la modification
+    if (sauce.userId === req.auth.userId) {
+      // si l'utilisateur modifie l'image alors
+      if (req.file) {
+        // si l'image est modifiée, il faut supprimer l'ancienne image dans le dossier /image
+        Sauce.findOne({ _id: req.params.id })
+          .then((sauce) => {
+            const filename = sauce.imageUrl.split("/images/")[1];
+            fs.unlink(`images/${filename}`, () => {
+              // une fois que l'ancienne image est supprimée dans le dossier /image, on peut mettre à jour le reste
+              const sauceObject = {
+                ...JSON.parse(req.body.sauce),
+                imageUrl: `${req.protocol}://${req.get("host")}/images/${
+                  req.file.filename
+                }`,
+              };
+              Sauce.updateOne(
+                { _id: req.params.id },
+                { ...sauceObject, _id: req.params.id }
+              )
+                .then(() =>
+                  res.status(200).json({ message: "Sauce modifiée!" })
+                )
+                .catch((error) => res.status(400).json({ error }));
+            });
+          })
+          .catch((error) => res.status(500).json({ error }));
+      }
+      // si l'utilisateur de modifie pas l'image alors nous modififions seulement le reste
+      else {
+        const sauceObject = { ...req.body };
+        Sauce.updateOne(
+          { _id: req.params.id },
+          { ...sauceObject, _id: req.params.id }
+        )
+          .then(() => res.status(200).json({ message: "Sauce modifiée!" }))
+          .catch((error) => res.status(400).json({ error }));
+      }
+    } else {
+      return res.status(403).json("Requête non autorisée.");
+    }
+  });
+};
+
 // Supprimer une sauce
-// sauce.userId ===  à l'id du créateur de la sauce
-// req.auth.userId === à l'id de celui qui fait la demande
 exports.deleteOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
+      // sauce.userId ===  à l'id du créateur de la sauce
+      // req.auth.userId === à l'id de celui qui fait la demande
       if (sauce.userId === req.auth.userId) {
         const filename = sauce.imageUrl.split("/images/")[1];
         fs.unlink(`images/${filename}`, () => {
@@ -107,88 +123,6 @@ exports.deleteOneSauce = (req, res, next) => {
       }
     })
     .catch((error) => res.status(500).json({ error }));
-};
-
-// Modifier une sauce
-exports.modifyOneSauce = (req, res, next) => {
-  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
-    // Vérification de l'utilisateur qui souhaite effectuer la modification
-    if (sauce.userId === req.auth.userId) {
-      // Tableau des champs requis avec une validation minimale de 4 caractères
-      const requiredFields = [
-        { field: "name", minLength: 2 },
-        { field: "manufacturer", minLength: 2 },
-        { field: "description", minLength: 5 },
-        { field: "mainPepper", minLength: 2 },
-      ];
-
-      // Vérification des champs requis
-      const missingFields = requiredFields.filter((field) => {
-        const fieldValue = req.body[field.field];
-        return !fieldValue || fieldValue.trim().length < field.minLength;
-      });
-
-      if (missingFields.length > 0) {
-        return res.status(400).json({
-          error: `Les champs suivants sont requis avec un minimum de ${
-            missingFields[0].minLength
-          } caractères : ${missingFields
-            .map((field) => field.field)
-            .join(", ")}`,
-        });
-      }
-
-      // Vérification de la valeur de heat
-      if (req.body.heat < 1 || req.body.heat > 10) {
-        return res
-          .status(400)
-          .json({ error: "Le champ heat doit être compris entre 1 et 10." });
-      }
-
-      // Regex pour correspondre aux extensions autorisées
-      const allowedExtensionsRegex =
-        /\.(jpeg|png|bmp|gif|ico|svg|tiff|tif|webp)$/i;
-
-      // Vérification de l'extension du fichier
-      if (req.body.imageUrl) {
-        const fileExtension = req.body.imageUrl.match(allowedExtensionsRegex);
-
-        if (!fileExtension) {
-          return res.status(400).json({
-            error:
-              "Seuls les formats jpeg, png, bmp, gif, ico, svp, tiff, tif et webp sont autorisés.",
-          });
-        }
-      } else if (req.file) {
-        const fileExtension = req.file.filename.match(allowedExtensionsRegex);
-
-        if (!fileExtension) {
-          return res.status(400).json({
-            error:
-              "Seuls les formats jpeg, png, bmp, gif, ico, svp, tiff, tif et webp sont autorisés.",
-          });
-        }
-      }
-
-      // Mise à jour des champs de la sauce
-      const sauceObject = {
-        ...req.body,
-        _id: req.params.id,
-      };
-
-      if (req.file) {
-        sauceObject.imageUrl = `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
-        }`;
-      }
-
-      Sauce.updateOne({ _id: req.params.id }, sauceObject)
-        .then(() => res.status(200).json({ message: "Sauce modifiée !" }))
-        .catch((error) => res.status(400).json({ error }));
-    } else {
-      return res.status(403).json("Requête non autorisée.");
-    }
-  });
 };
 
 // Like ou dislike une sauce

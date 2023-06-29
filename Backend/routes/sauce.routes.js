@@ -3,6 +3,7 @@ const router = express.Router();
 const saucesCtrl = require("../controllers/sauces_controller");
 const auth = require("../middlewares/auth");
 const multer = require("../middlewares/multer-config");
+const validate = require("../middlewares/validate-inputs");
 
 // Afficher toutes les sauces
 router.get("/", auth, saucesCtrl.getAllSauces);
@@ -11,13 +12,13 @@ router.get("/", auth, saucesCtrl.getAllSauces);
 router.get("/:id", auth, saucesCtrl.getOneSauce);
 
 // Publier une sauce
-router.post("/", auth, multer, saucesCtrl.createSauce);
+router.post("/", auth, multer, validate.sauce, saucesCtrl.createSauce);
+
+// Mettre à jour une sauce
+router.put("/:id", auth, multer, validate.sauce, saucesCtrl.modifyOneSauce);
 
 // Supprimer une sauce
 router.delete("/:id", auth, saucesCtrl.deleteOneSauce);
-
-// Mettre à jour une sauce
-router.put("/:id", auth, multer, saucesCtrl.modifyOneSauce);
 
 // Like ou dislike une sauce
 router.post("/:id/like", auth, saucesCtrl.likeOneSauce);
