@@ -3,7 +3,7 @@ Bonjour, voici les instructions :
 
  1 DANS LE DOSSIER CONFIG IL FAUT AJOUTER UN FICHIER .ENV: (EXEMPLE AVEC LE FICHIER .ENV.EXAMPLE)
  
-    backend
+    Backend
       config
         .env
         DB.js
@@ -13,7 +13,11 @@ Bonjour, voici les instructions :
   
       Pour cela ouvrez un terminal via le chemin d'accès "Backend" et entrez la commande suivante : "npm install"
 
+3 DANS LE DOSSIER BACKEND IL FAUT CREER UN DOSSIER "images" ET AJOUTEZ-Y DES IMAGES:
+    Backend
+      images
 
-3 LANCEZ NODEMON SI BESOIN
+
+4 LANCEZ NODEMON SI BESOIN
       
       Pour cela ouvrez un terminal via le chemin d'accès "Backend" et entrez la commande suivante : "nodemon server"
