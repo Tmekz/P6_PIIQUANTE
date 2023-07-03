@@ -61,6 +61,10 @@ exports.createSauce = (req, res, next) => {
 // Modifier une sauce
 exports.modifyOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    // Vérification si la sauce existe
+    if (!sauce) {
+      return res.status(404).json({ error: "Sauce non trouvée." });
+    }
     // Vérification de l'utilisateur qui souhaite effectuer la modification
     if (sauce.userId === req.auth.userId) {
       // si l'utilisateur modifie l'image alors

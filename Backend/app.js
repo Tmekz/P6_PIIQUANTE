@@ -2,9 +2,6 @@
 const express = require("express");
 const app = express();
 
-// Importation du package mongoose
-const mongoose = require("mongoose");
-
 //   Importation .env
 const dotenv = require("dotenv").config({ path: "./config/.env" });
 
@@ -19,16 +16,10 @@ connectDB();
 
 // Importation des routes
 const userRoutes = require("./routes/user.routes");
-
-// Importation des models
-const Sauce = require("./models/Sauce_model");
-
 const saucesRoutes = require("./routes/sauce.routes");
 
 // on importe path, donne accés au chemin du système de fichiers
 const path = require("path");
-const { log } = require("console");
-const multer = require("multer");
 
 // Permet le cross origin pour éviter les erreurs de CORS
 app.use((req, res, next) => {
