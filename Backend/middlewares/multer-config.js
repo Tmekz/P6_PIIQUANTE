@@ -1,3 +1,4 @@
+// Multer est un middleware de gestion de fichiers. Il permet notamment aux utilisateurs de télécharger des fichiers et permet au serveur de récupérer ces fichiers.
 const multer = require("multer");
 const MIME_TYPES = {
   "image/jpg": "jpg",

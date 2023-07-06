@@ -1,3 +1,4 @@
+// package de validation de données pour JS qui offre une synxtaxe simple et expressive pou rdéfinir des schémas de validation et vérifier si les données correspondent
 const Joi = require("@hapi/joi");
 
 const sauceSchema = Joi.object({

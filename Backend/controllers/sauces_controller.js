@@ -39,6 +39,7 @@ exports.createSauce = (req, res, next) => {
     imageUrl: `${req.protocol}://${req.get("host")}/images/${fileName}`,
     likes: 0,
     dislikes: 0,
+    // ajouter par default pour optimisation
   });
 
   // sauceObject.userId ===  à l'id du créateur de la sauce

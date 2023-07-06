@@ -1,5 +1,7 @@
-// Importation du package HTTP de Node pour écouter les requetes HTTPO
+// Importation du package HTTP natif de Node pour écouter les requetes HTTP
 const http = require("http");
+
+// Importation de notre fichier app qui utilise express
 const app = require("./app");
 
 // la fonction normalizePort renvoie un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne ;
@@ -16,6 +18,7 @@ const normalizePort = (val) => {
 };
 const port = normalizePort(process.env.PORT || "3000");
 // Par defaut port 3000 mais si pas disponible variable process.env.port
+// la fonction normalizePort renvoie un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne ;
 app.set("port", port);
 
 // la fonction errorHandler  recherche les différentes erreurs et les gère de manière appropriée. Elle est ensuite enregistrée dans le serveur ;
@@ -40,6 +43,8 @@ const errorHandler = (error) => {
   }
 };
 
+// Grace à la méthode .createServer du package HTTP on va démarrer notre server 
+// On demande a notre server de jouer l'application express dans notre fichier app
 const server = http.createServer(app);
 // un écouteur d'évènements est également enregistré, consignant le port ou le canal nommé sur lequel le serveur s'exécute dans la console.
 server.on("error", errorHandler);

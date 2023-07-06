@@ -1,4 +1,4 @@
-// Importation du package mongoose
+// Importation du package mongoose qui facilite les interactions entre notre app Express et notre base de données MongoDB
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
